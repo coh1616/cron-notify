@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
-import Ping from "@/models/Ping";
+import { recordPing } from "@/lib/ping";
 
 export async function GET(request) {
   const secret = request.headers.get("x-cron-secret");
@@ -8,7 +7,6 @@ export async function GET(request) {
     return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
   }
 
-  await connectToDatabase();
-  const ping = await Ping.create({});
-  return NextResponse.json({ success: true, timestamp: ping.timestamp });
+  const timestamp = await recordPing();
+  return NextResponse.json({ success: true, timestamp });
 }
